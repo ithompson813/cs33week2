@@ -3,12 +3,17 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django import forms
 
-from .models import User
+from .models import User, Listing
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html", {
+
+        "listings": Listing.objects.all()
+
+    })
 
 
 def login_view(request):
@@ -69,5 +74,42 @@ def categories(request):
 def watchlist(request):
     return render(request, "auctions/index.html")
 
+
+# django form for creating a new listing
+class NewListingForm(forms.Form):
+    title = forms.CharField(label = "Title")
+    description = forms.CharField(widget=forms.Textarea, label = "Description")
+    starting_bid = forms.FloatField(label = "Starting Bid")
+    image = forms.CharField(label = "Image Link", required = False)
+    
+
 def create(request):
-    return render(request, "auctions/index.html")
+
+    if request.method == "GET":
+        return render(request, "auctions/create.html", {
+
+            "form": NewListingForm()
+
+        })
+
+    elif request.method == "POST":
+
+        form = NewListingForm(request.POST)
+
+        
+        if form.is_valid():
+
+            form_title = form.cleaned_data["title"]
+            form_description = form.cleaned_data["description"]
+            form_starting_bid = form.cleaned_data["starting_bid"]
+            form_image = form.cleaned_data["image"]
+
+            listing = Listing(title=form_title, description=form_description, starting_bid=form_starting_bid, image=form_image)
+            listing.save()
+
+            return HttpResponseRedirect(reverse("index"))
+
+        else: 
+            return render(request, "auctions/create.html", {
+                "form": form
+            })
