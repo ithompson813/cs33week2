@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -11,7 +12,7 @@ from .models import User, Listing
 def index(request):
     return render(request, "auctions/index.html", {
 
-        "listings": Listing.objects.all()
+        "listings": Listing.objects.filter(is_active=True)
 
     })
 
@@ -83,8 +84,10 @@ class NewListingForm(forms.Form):
     image = forms.CharField(label = "Image Link", required = False)
     
 
+@login_required
 def create(request):
 
+    # for get requests, display the form
     if request.method == "GET":
         return render(request, "auctions/create.html", {
 
