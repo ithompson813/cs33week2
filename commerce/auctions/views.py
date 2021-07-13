@@ -7,7 +7,7 @@ from django.urls import reverse
 from django import forms
 import urllib
 
-from .models import User, Listing
+from .models import User, Listing, Bid
 
 
 def index(request):
@@ -111,6 +111,9 @@ def create(request):
             listing = Listing(title=form_title, description=form_description, starting_bid=form_starting_bid, image=form_image)
             listing.save()
 
+            bid = Bid(amount=form_starting_bid, item=listing, bidder=request.user)
+            bid.save()
+
             return HttpResponseRedirect(reverse("index"))
 
         else: 
@@ -121,10 +124,16 @@ def create(request):
 
 def listing(request, listing):
 
+    listing_to_display = Listing.objects.get(title=listing)
+
+    if (Bid.objects.get(item = listing_to_display)):
+        highest_bid = Bid.objects.get(item = listing_to_display)
+        print(highest_bid.amount)
+
     return render(request, "auctions/listings/listing.html", {
 
-        "listing": Listing.objects.get(title=listing)
-
+        "listing": listing_to_display
+        
     })
 
 

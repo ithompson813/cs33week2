@@ -30,7 +30,7 @@ class Listing(models.Model):
     category = models.CharField(max_length=64, choices=category_choices, default="none")
 
     def __str__(self):
-        return f"{self.title} yep"
+        return f"{self.title}"
 
     def title_to_url(self):
         return self.title.replace(" ", "-")
@@ -38,7 +38,11 @@ class Listing(models.Model):
 
 class Bid(models.Model):
     amount = models.FloatField(max_length=10, default=0)
-    bidder = models.ForeignKey('user', on_delete=models.CASCADE)
+    bidder = models.ForeignKey('User', on_delete=models.CASCADE)
+    item = models.ForeignKey('Listing', on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"A bid for {self.amount} on {self.item} by {self.bidder}"
     
 
 class Comment(models.Model):
