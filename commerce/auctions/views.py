@@ -5,12 +5,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django import forms
-import urllib
+from django.db.models import Max
 
 from .models import User, Listing, Bid
 
 
 def index(request):
+    
     return render(request, "auctions/index.html", {
 
         "listings": Listing.objects.filter(is_active=True)
@@ -126,13 +127,15 @@ def listing(request, listing):
 
     listing_to_display = Listing.objects.get(title=listing)
 
-    if (Bid.objects.get(item = listing_to_display)):
-        highest_bid = Bid.objects.get(item = listing_to_display)
-        print(highest_bid.amount)
+    #if (Bid.objects.get(item = listing_to_display)):
+        # highest_bid = Bid.objects.get(item = listing_to_display)
+    all_bids = Bid.objects.filter(item = listing_to_display)
+    highest_bid = all_bids.aggregate(Max('amount'))
 
     return render(request, "auctions/listings/listing.html", {
 
-        "listing": listing_to_display
+        "listing": listing_to_display,
+        "bid": highest_bid['amount__max']
         
     })
 

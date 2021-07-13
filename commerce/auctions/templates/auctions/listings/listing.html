@@ -12,11 +12,13 @@
     </div>
     {% endif %}
     <br>
-    <h3> CURRENT BID: </h3>
+    <h3> CURRENT BID: ${{bid}} </h3>
 
-    <li>
-        <a href="{% url 'bid' %}">Make a Bid</a>
-    </li>
+    <h7> Place a bid:</h7>
+    <form>
+        <input type="number" placeholder="At least: {{bid}}">
+        <input type="submit">
+    </form>
 
 
 {% endblock %}
