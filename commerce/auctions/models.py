@@ -6,6 +6,7 @@ class User(AbstractUser):
     pass
 
 
+
 # define possible categories
 category_choices = (
     ("none", "None"),
@@ -15,6 +16,7 @@ category_choices = (
     ("home", "Home & Garden"),
     ("sports", "Sports"),
     ("auto", "Automotive"),
+    ("health", "Health")
 )
 
 
@@ -28,11 +30,16 @@ class Listing(models.Model):
     category = models.CharField(max_length=64, choices=category_choices, default="none")
 
     def __str__(self):
-        return f"Title: {self.title}"
+        return f"{self.title} yep"
+
+    def title_to_url(self):
+        return self.title.replace(" ", "-")
     
 
 class Bid(models.Model):
-    pass
+    amount = models.FloatField(max_length=10, default=0)
+    bidder = models.ForeignKey('user', on_delete=models.CASCADE)
+    
 
 class Comment(models.Model):
     pass

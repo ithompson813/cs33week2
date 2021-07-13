@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django import forms
+import urllib
 
 from .models import User, Listing
 
@@ -116,3 +117,17 @@ def create(request):
             return render(request, "auctions/create.html", {
                 "form": form
             })
+
+
+def listing(request, listing):
+
+    return render(request, "auctions/listings/listing.html", {
+
+        "listing": Listing.objects.get(title=listing)
+
+    })
+
+
+def bid(request):
+    
+    return HttpResponse("yep")

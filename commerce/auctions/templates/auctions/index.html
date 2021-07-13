@@ -6,14 +6,20 @@
     <ul>
 
         {% for listing in listings %}
-        <li>
-            <h5> {{listing.title}} </h5>
-            <h6> {{listing.description}} </h6>
-            <h7> ${{listing.starting_bid}} </h7>
+        
+            <a href= "/listings/{{listing.title}}"> {{listing.title}} </a>
+
+            <li>
+                <h6> {{listing.description}} </h6>
+            </li>
+
+            <h5> ${{listing.starting_bid}} </h5>
+
             {% if listing.image %}
             <div>
                 <img src={{listing.image}} width = "25%">
             </div>
+            <br><br>
             {% endif %}
         </li>
         {% endfor %}
