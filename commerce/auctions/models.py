@@ -28,7 +28,7 @@ class Listing(models.Model):
     image = models.CharField(max_length=500, blank=True)
     is_active = models.BooleanField(default=True)
     category = models.CharField(max_length=64, choices=category_choices, default="none")
-    creator =  models.ForeignKey('User', on_delete=models.CASCADE)
+    creator =  models.ForeignKey('User', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"{self.title}"
@@ -47,7 +47,12 @@ class Bid(models.Model):
     
 
 class Comment(models.Model):
-    pass
+    text = models.CharField(max_length=500, null=True)
+    writer = models.ForeignKey('User', on_delete=models.CASCADE, null=True)
+    item = models.ForeignKey('Listing', on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"Comment made by {self.writer} on {self.item}"
 
 
 class Category(models.Model):

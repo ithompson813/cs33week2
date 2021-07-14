@@ -6,21 +6,85 @@
 
     <h3> {{listing.description}} </h3>
 
+    <h7> Listed by: {{listing.creator}} </h7>
+
+    <h7> Category: {{listing.category}} </h7>
+
     {% if listing.image %}
     <div>
         <img src={{listing.image}} width = "25%">
     </div>
     {% endif %}
     <br>
-    <h3> CURRENT BID: ${{bid}} </h3>
 
-    <h7> Place a bid:</h7>
+    {% if listing.is_active %}
 
-    <form action = "{% url 'bid' %}">
-        <input type="number" name = "amount" placeholder="At least: {{bid}}">
-        <input type="hidden" name="listing" value={{listing}}>
+        <h3> CURRENT BID: ${{bid.amount}} </h3>
+
+        <h7> Place a bid:</h7>
+
+        <form action = "{% url 'bid' %}">
+            <input type="float" name = "amount" placeholder="At least: {{bid.amount}}">
+            <input type="hidden" name="listing" value="{{listing}}">
+            <input type="submit">
+        </form>
+
+        <p> There have been {{bid_count}} bid(s) already </p>
+
+        {% ifequal listing.creator current_user %}
+
+            <h7>This is your auction</h7>
+            <form action = "{% url 'close' %}">
+                <input type="hidden" name = "listing" value="{{listing}}">
+                <button type="submit"> Close Auction </button>
+            </form>
+
+        {% endifequal %}
+
+    {% else %}
+
+            <h2> Auction Closed</h2>
+
+            {% ifequal bid.bidder current_user %}
+
+                <h1> You Won! </h1>
+
+            {% endifequal %}
+
+    {% endif %}
+
+    <br>
+    <h3> Comments: </h3>
+
+    {% for comment in comments %}
+
+                <h5> {{comment.writer}} said: </h5>
+                <p> {{comment.text}} </p>
+            
+    {% endfor %}
+
+    {% ifequal AnonymousUser current_user %}
+
+        <form action = "{% url 'comment' %}">
+            <input type="text" name = "text" placeholder="write comment here">
+            <input type="hidden" name="listing" value="{{listing}}">
+            <input type="submit">
+        </form>
+
+    {% endifequal %}
+
+    {% if user.is_authenticated %}
+
+    <form action = "{% url 'comment' %}">
+        <input type="text" name = "text" placeholder="write comment here">
+        <input type="hidden" name="listing" value="{{listing}}">
         <input type="submit">
     </form>
 
+    {% else %}
+
+        <h7> Sign in to comment</h7>
+
+    {% endif %}
 
 {% endblock %}

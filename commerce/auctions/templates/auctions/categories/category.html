@@ -1,0 +1,23 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h1> Listings in {{category}}: </h1>
+
+    {% if listings %}
+        {% for listing in listings %}
+
+            <li>        
+                <a href= "/listings/{{listing.title}}" style="font-size: large;"> {{listing.title}} </a>
+            </li>
+
+        {% endfor %}
+
+    {% else %}
+
+            <h5> NONE! (so far) </h5>
+
+    {% endif %}
+
+
+{% endblock %}
