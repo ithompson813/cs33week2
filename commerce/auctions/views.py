@@ -142,4 +142,35 @@ def listing(request, listing):
 
 def bid(request):
     
-    return HttpResponse("yep")
+    # retrieve listing title from html
+    title = request.GET.get('listing')
+
+    # use title to find listing object from database
+    listing = Listing.objects.get(title=title)
+
+    # retrieve bid amount from html
+    amount = request.GET.get('amount')
+
+    try:
+
+        # check new bid is greater than current price
+        if (float(amount) > listing.starting_bid):
+
+            # create and save bid
+            bid = Bid(amount=amount, item=listing, bidder=request.user)
+            bid.save()
+
+            # update listing's current price
+            listing.starting_bid = amount
+            listing.save()
+
+            return HttpResponseRedirect(reverse("index"))
+
+
+        else:
+            return HttpResponse("Your bid was too low!")
+
+
+    # protect against non-numeric bids
+    except ValueError:
+        return HttpResponse("Invalid Bid")

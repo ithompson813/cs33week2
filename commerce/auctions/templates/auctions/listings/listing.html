@@ -15,8 +15,10 @@
     <h3> CURRENT BID: ${{bid}} </h3>
 
     <h7> Place a bid:</h7>
-    <form>
-        <input type="number" placeholder="At least: {{bid}}">
+
+    <form action = "{% url 'bid' %}">
+        <input type="number" name = "amount" placeholder="At least: {{bid}}">
+        <input type="hidden" name="listing" value={{listing}}>
         <input type="submit">
     </form>
 

@@ -28,6 +28,7 @@ class Listing(models.Model):
     image = models.CharField(max_length=500, blank=True)
     is_active = models.BooleanField(default=True)
     category = models.CharField(max_length=64, choices=category_choices, default="none")
+    creator =  models.ForeignKey('User', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.title}"
