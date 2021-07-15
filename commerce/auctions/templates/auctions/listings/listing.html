@@ -2,12 +2,10 @@
 
 {% block body %}
 
+    <!-- Display info about listing -->
     <h2> {{listing.title}} </h2>
-
     <h3> {{listing.description}} </h3>
-
     <h7> Listed by: {{listing.creator}} </h7>
-
     <h7> Category: {{listing.category}} </h7>
 
     {% if listing.image %}
@@ -17,12 +15,13 @@
     {% endif %}
     <br>
 
+    <!-- Allow user to interact with listing as long as it is active -->
     {% if listing.is_active %}
 
         <h3> CURRENT BID: ${{bid.amount}} </h3>
-
         <h7> Place a bid:</h7>
 
+        <!-- Form for placing a Bid -->
         <form action = "{% url 'bid' %}">
             <input type="float" name = "amount" placeholder="At least: {{bid.amount}}">
             <input type="hidden" name="listing" value="{{listing}}">
@@ -31,8 +30,10 @@
 
         <p> There have been {{bid_count}} bid(s) already </p>
 
+        <!-- Check if current user created listing -->
         {% ifequal listing.creator current_user %}
 
+            <!-- Form for closing listing -->
             <h7>This is your auction</h7>
             <form action = "{% url 'close' %}">
                 <input type="hidden" name = "listing" value="{{listing}}">
@@ -41,6 +42,7 @@
 
         {% endifequal %}
 
+    <!-- Display final information if listing is closed -->
     {% else %}
 
             <h2> Auction Closed</h2>
@@ -57,12 +59,13 @@
 
     {% endif %}
 
+    <!-- If user is signed in, allow them to add/remove listing from watchlist-->
     {% if user.is_authenticated %}
 
         {% if listing not in watchlist %}
 
+            <!-- Form for saving a listing -->
             <h7> Want to save this listing? </h7>
-
             <form action = "{% url 'save_listing' %}">
                 <input type="hidden" name = "listing" value="{{listing}}">
                 <button type="submit"> Add To Watchlist </button>
@@ -70,8 +73,8 @@
 
         {% else %}
 
+            <!-- Form for removing a listing -->
             <h7> Want to remove this listing from your watchlist? </h7>
-
             <form action = "{% url 'remove_listing' %}">
                 <input type="hidden" name = "listing" value="{{listing}}">
                 <button type="submit"> Remove From Watchlist </button>
@@ -89,6 +92,7 @@
     <br>
     <h3> Comments: </h3>
 
+    <!-- Display comments, comment data is passed from entry view -->
     {% for comment in comments %}
 
                 <h5> {{comment.writer}} said: </h5>
@@ -96,18 +100,10 @@
             
     {% endfor %}
 
-    {% ifequal AnonymousUser current_user %}
-
-        <form action = "{% url 'comment' %}">
-            <input type="text" name = "text" placeholder="write comment here">
-            <input type="hidden" name="listing" value="{{listing}}">
-            <input type="submit">
-        </form>
-
-    {% endifequal %}
-
+    <!-- If user is signed in, allow them to comment-->
     {% if user.is_authenticated %}
 
+    <!-- Form for adding a new comment -->
     <form action = "{% url 'comment' %}">
         <input type="text" name = "text" placeholder="write comment here">
         <input type="hidden" name="listing" value="{{listing}}">

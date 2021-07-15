@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-# define possible categories
+# define possible categories for the category field in the Listing model
 category_choices = (
     ("none", "None"),
     ("electronics", "Electronics"),
@@ -13,7 +13,6 @@ category_choices = (
     ("auto", "Automotive"),
     ("health", "Health")
 )
-
 
 
 class Listing(models.Model):
@@ -27,9 +26,6 @@ class Listing(models.Model):
 
     def __str__(self):
         return f"{self.title}"
-
-    def title_to_url(self):
-        return self.title.replace(" ", "-")
     
 
 class User(AbstractUser):
@@ -53,7 +49,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment made by {self.writer} on {self.item}"
-
-
-class Category(models.Model):
-    pass

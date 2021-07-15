@@ -9,9 +9,10 @@ from django.db.models import Max
 
 from .models import Comment, User, Listing, Bid, category_choices
 
-
+# default route for the site
 def index(request):
     
+    # show a list of all active listings
     return render(request, "auctions/index.html", {
 
         "listings": Listing.objects.filter(is_active=True),
@@ -72,24 +73,31 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+# shows a list of available categories to user
 def category_list(request):
 
+    # pass the category_choices list defined in models.py to site to display
     return render(request, "auctions/categories.html", {
     
         "categories": category_choices
 
     })
 
+
+# shows active listings in a chosen category
 def category_options(request, category):
 
+    # aggregate all active lisings of desired category
     list_of_listings = Listing.objects.filter(category = category, is_active=True)
 
+    # pass info to html page and display
     return render(request, "auctions/categories/category.html", {
 
         "listings": list_of_listings,
         "category": category
 
     })
+
 
 # django form for creating a new listing
 class NewListingForm(forms.Form):
@@ -100,6 +108,7 @@ class NewListingForm(forms.Form):
     category = forms.CharField(label= "Category", widget=forms.Select(choices=category_choices))
     
 
+# create a new listing
 @login_required
 def create(request):
 
@@ -165,6 +174,12 @@ def listing(request, listing):
     # get comment data
     comments = Comment.objects.filter(item=listing_to_display)
 
+    # get user's watchlist data if user is signed in
+    if request.user.is_anonymous:
+        watchlist = None
+    else:
+        watchlist = request.user.saved_listing.all()
+
     # render html page with this data
     return render(request, "auctions/listings/listing.html", {
 
@@ -173,10 +188,12 @@ def listing(request, listing):
         "bid_count": all_bids.count(),
         "current_user": request.user,
         "comments": comments,
-        "watchlist": request.user.saved_listing.all()
+        "watchlist": watchlist
         
     })
 
+
+# add a bid to a listing
 @login_required
 def bid(request):
     
@@ -191,7 +208,7 @@ def bid(request):
 
     try:
 
-        # check new bid is greater than current price
+        # check if new bid is greater than current price
         if (float(amount) > listing.starting_bid):
 
             # create and save bid
@@ -202,18 +219,19 @@ def bid(request):
             listing.starting_bid = amount
             listing.save()
 
+            # return user to listings page
             return HttpResponseRedirect(reverse("index"))
 
-
+        # display an error if bid is below current price
         else:
             return HttpResponse("Your bid was too low!")
-
 
     # protect against non-numeric bids
     except ValueError:
         return HttpResponse("Invalid Bid")
 
 
+# closes an active listing
 @login_required
 def close(request):
 
@@ -231,6 +249,7 @@ def close(request):
     return (listing(request, item))
 
 
+# add a comment to a listing page
 @login_required
 def comment(request):
 
@@ -249,12 +268,15 @@ def comment(request):
     return (listing(request, item))
 
 
-
+# display listings in user's watchlist
 @login_required
 def watchlist(request):
 
+    # retrieve listings in user's watchlist
     saved_listings = request.user.saved_listing.all()
 
+    # pass info the html page and display
+    # this method shares the index.html, but renders a different headline
     return render(request, "auctions/index.html", {
 
         "listings": saved_listings,
@@ -262,6 +284,8 @@ def watchlist(request):
 
     })
 
+
+# save a listing to a user's watchlist
 @login_required
 def save_listing(request):
 
@@ -275,12 +299,11 @@ def save_listing(request):
     request.user.saved_listing.add(item)
     request.user.save()
 
-    print(request.user.saved_listing.all())
-
+    # return to page
     return listing(request, item)
 
 
-
+# remove a listing from user's watchlist
 @login_required
 def remove_listing(request):
 
@@ -290,12 +313,11 @@ def remove_listing(request):
     # save listing to variable
     item = Listing.objects.get(title=title)
 
-    # add listing to user's watchlist
+    # remove listing from user's watchlist
     request.user.saved_listing.remove(item)
     request.user.save()
 
-    print(request.user.saved_listing.all())
-
+    # return to page
     return listing(request, item)
 
 
