@@ -48,8 +48,41 @@
             {% ifequal bid.bidder current_user %}
 
                 <h1> You Won! </h1>
+            
+            {% else %}
+
+                <h1> {{bid.bidder}} Won! </h1>
 
             {% endifequal %}
+
+    {% endif %}
+
+    {% if user.is_authenticated %}
+
+        {% if listing not in watchlist %}
+
+            <h7> Want to save this listing? </h7>
+
+            <form action = "{% url 'save_listing' %}">
+                <input type="hidden" name = "listing" value="{{listing}}">
+                <button type="submit"> Add To Watchlist </button>
+            </form>
+
+        {% else %}
+
+            <h7> Want to remove this listing from your watchlist? </h7>
+
+            <form action = "{% url 'remove_listing' %}">
+                <input type="hidden" name = "listing" value="{{listing}}">
+                <button type="submit"> Remove From Watchlist </button>
+            </form>
+
+        {% endif %}
+
+
+    {% else %}
+
+        <h7> Sign in to save listings </h7>
 
     {% endif %}
 

@@ -14,7 +14,8 @@ def index(request):
     
     return render(request, "auctions/index.html", {
 
-        "listings": Listing.objects.filter(is_active=True)
+        "listings": Listing.objects.filter(is_active=True),
+        "header_text": "All Active Listings"
 
     })
 
@@ -89,10 +90,6 @@ def category_options(request, category):
         "category": category
 
     })
-
-def watchlist(request):
-    return render(request, "auctions/index.html")
-
 
 # django form for creating a new listing
 class NewListingForm(forms.Form):
@@ -175,7 +172,8 @@ def listing(request, listing):
         'bid': highest_bid,
         "bid_count": all_bids.count(),
         "current_user": request.user,
-        "comments": comments
+        "comments": comments,
+        "watchlist": request.user.saved_listing.all()
         
     })
 
@@ -249,3 +247,55 @@ def comment(request):
 
     # return user to listing page
     return (listing(request, item))
+
+
+
+@login_required
+def watchlist(request):
+
+    saved_listings = request.user.saved_listing.all()
+
+    return render(request, "auctions/index.html", {
+
+        "listings": saved_listings,
+        "header_text": "Watchlist"
+
+    })
+
+@login_required
+def save_listing(request):
+
+    # retrieve data from html form
+    title = request.GET.get('listing')
+
+    # save listing to variable
+    item = Listing.objects.get(title=title)
+
+    # add listing to user's watchlist
+    request.user.saved_listing.add(item)
+    request.user.save()
+
+    print(request.user.saved_listing.all())
+
+    return listing(request, item)
+
+
+
+@login_required
+def remove_listing(request):
+
+    # retrieve data from html form
+    title = request.GET.get('listing')
+
+    # save listing to variable
+    item = Listing.objects.get(title=title)
+
+    # add listing to user's watchlist
+    request.user.saved_listing.remove(item)
+    request.user.save()
+
+    print(request.user.saved_listing.all())
+
+    return listing(request, item)
+
+

@@ -2,11 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
-    pass
-
-
-
 # define possible categories
 category_choices = (
     ("none", "None"),
@@ -36,6 +31,11 @@ class Listing(models.Model):
     def title_to_url(self):
         return self.title.replace(" ", "-")
     
+
+class User(AbstractUser):
+    saved_listing = models.ManyToManyField(Listing, related_name="watchlist")
+    
+
 
 class Bid(models.Model):
     amount = models.FloatField(max_length=10, default=0)
